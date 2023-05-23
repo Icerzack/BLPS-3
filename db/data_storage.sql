@@ -8,6 +8,8 @@ CREATE TABLE users (
   name VARCHAR(100),
   email VARCHAR(100),
   phone_number VARCHAR(16) NOT NULL,
+  password VARCHAR(32) NOT NULL,
+  role VARCHAR(16) NOT NULL,
   last_update timestamp NOT NULL
 );
 
@@ -20,8 +22,8 @@ CREATE TABLE payments (
 
 CREATE TABLE orders (
   id bigserial PRIMARY KEY,
-  user_id bigint REFERENCES users(id) NOT NULL,
-  payment_id bigint REFERENCES payments(id),
+  user_id bigint REFERENCES users(id) ON DELETE CASCADE,
+  payment_id bigint REFERENCES payments(id) ON DELETE CASCADE,
   cost double precision NOT NULL,
   order_date timestamp NOT NULL,
   address VARCHAR(100) NOT NULL,
@@ -30,7 +32,7 @@ CREATE TABLE orders (
 
 CREATE TABLE user_payments (
   id bigserial PRIMARY KEY,
-  user_id bigint REFERENCES users(id) NOT NULL UNIQUE,
-  payment_id bigint REFERENCES payments(id) NOT NULL
+  user_id bigint REFERENCES users(id) ON DELETE CASCADE,
+  payment_id bigint REFERENCES payments(id) ON DELETE CASCADE
 );
 

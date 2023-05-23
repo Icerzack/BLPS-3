@@ -1,5 +1,6 @@
 package com.example.demo.Dao.Order;
 
+import com.example.demo.Dao.User.UserEntity;
 import com.example.demo.Dto.PaymentType;
 import lombok.Data;
 
@@ -15,8 +16,9 @@ public class OrderEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    private UserEntity user;
 
     @Column(name = "order_date", nullable = false)
     private Timestamp orderDate;

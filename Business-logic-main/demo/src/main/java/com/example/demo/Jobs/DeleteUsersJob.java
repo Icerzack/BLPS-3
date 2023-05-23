@@ -18,7 +18,7 @@ public class DeleteUsersJob implements Job {
     @Override
     public void execute(JobExecutionContext context) {
         System.out.println("Running cron task on deleting accounts");
-//        quartzService.deleteUnusedAccounts();
+        quartzService.deleteUnusedAccounts();
     }
 
 }
