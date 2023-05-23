@@ -1,4 +1,4 @@
-package com.example.demo.Server;
+package com.example.demo.Service;
 
 import com.example.demo.Dao.Payment.PaymentsEntity;
 import com.example.demo.Dao.Payment.PaymentsRepository;
@@ -10,7 +10,6 @@ import com.example.demo.Dto.Responses.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.jta.JtaTransactionManager;
 
 import javax.transaction.*;

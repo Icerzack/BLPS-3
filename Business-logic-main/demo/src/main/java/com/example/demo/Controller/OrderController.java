@@ -4,7 +4,7 @@ import com.example.demo.Dto.Requests.PerformPaymentRequest;
 import com.example.demo.Dto.Responses.CheckSmsResponse;
 import com.example.demo.Dto.Responses.CheckSumResponse;
 import com.example.demo.Dto.Responses.PerformPaymentResponse;
-import com.example.demo.Server.OrderService;
+import com.example.demo.Service.OrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;

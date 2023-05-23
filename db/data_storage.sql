@@ -7,7 +7,8 @@ CREATE TABLE users (
   id bigserial PRIMARY KEY,
   name VARCHAR(100),
   email VARCHAR(100),
-  phone_number VARCHAR(16) NOT NULL
+  phone_number VARCHAR(16) NOT NULL,
+  last_update timestamp NOT NULL
 );
 
 CREATE TABLE payments (

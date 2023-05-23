@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 
 @Data
 @Entity
@@ -24,4 +25,6 @@ public class UserEntity {
     private String password;
     @Column(nullable = false,name="role")
     private String role;
+    @Column(nullable = false,name="last_update")
+    private Timestamp last_update;
 }

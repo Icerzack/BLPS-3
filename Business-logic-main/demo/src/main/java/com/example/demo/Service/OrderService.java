@@ -1,4 +1,4 @@
-package com.example.demo.Server;
+package com.example.demo.Service;
 
 import com.example.demo.Dto.Responses.CheckSmsResponse;
 import com.example.demo.Dto.Responses.CheckSumResponse;
