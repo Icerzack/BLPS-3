@@ -3,7 +3,7 @@ package com.example.demo.Controller;
 import com.example.demo.Dto.Requests.AddPaymentRequest;
 import com.example.demo.Dto.Requests.AddPhoneRequest;
 import com.example.demo.Dto.Responses.*;
-import com.example.demo.Server.UserService;
+import com.example.demo.Service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
