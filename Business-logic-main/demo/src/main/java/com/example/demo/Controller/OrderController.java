@@ -19,23 +19,26 @@ public class OrderController {
 
     @GetMapping("/v1/order-management/check-sum")
     @ApiOperation(value = "Проверяет, что сумма больше 100")
-    public ResponseEntity<CheckSumResponse> checkSum(@RequestParam int id, @RequestParam int sum) {
-        return orderService.checkSum((long) id, sum);
+    public ResponseEntity<CheckSumResponse> checkSum(@RequestParam int sum) {
+        return orderService.checkSum(sum);
     }
 
     @GetMapping("/v1/order-management/check-sms")
     @ApiOperation(value = "Проверяет, что введенный код смс верен для данного номера")
-    public ResponseEntity<CheckSmsResponse> checkSms(@RequestParam int id, @RequestParam String phone, @RequestParam String sms) {
-        return orderService.checkSms(id, phone, sms);
+    public ResponseEntity<CheckSmsResponse> checkSms(@RequestParam String phone, @RequestParam String sms) {
+        return orderService.checkSms(phone, sms);
     }
 
     @PostMapping("/v1/order-management/perform-payment")
     @ApiOperation(value = "Осуществляет покупку с указанными данными карты")
     public ResponseEntity<PerformPaymentResponse> performPayment(@RequestBody PerformPaymentRequest request) {
+        int userId = request.getUserId();
         String cardNum = request.getCardNum();
         String cardDate = request.getCardDate();
         String cardCvv = request.getCardCvv();
-        return orderService.performPayment(cardNum, cardDate, cardCvv);
+        Double cost = request.getCost();
+        String address = request.getAddress();
+        return orderService.performPayment(userId, cardNum, cardDate, cardCvv, cost, address);
     }
 
 }
