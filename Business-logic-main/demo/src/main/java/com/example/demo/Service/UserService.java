@@ -181,14 +181,11 @@ public class UserService {
         return ResponseEntity.ok(deletePaymentResponse);
     }
     public boolean addOrder(PerformPaymentRequest performPaymentRequest) {
-        // Ваш код для добавления заказа
+        System.out.println(performPaymentRequest);
         OrderEntity order = new OrderEntity();
         Optional<UserEntity> userEntity = userRepository.findById(performPaymentRequest.getUserId());
-        if (userEntity.isPresent()) {
-            order.setUser(userEntity.get());
-        } else{
-            return false;
-        }
+        System.out.println(userEntity.get().getId());
+        order.setUser(userEntity.get());
         order.setOrderDate(new Timestamp(System.currentTimeMillis()));
         order.setAddress(performPaymentRequest.getAddress());
         Optional<PaymentsEntity> paymentsEntity = paymentRepository.findByCardNum(performPaymentRequest.getCardNum());
