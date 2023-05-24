@@ -9,6 +9,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @RestController
 @Api(tags = "Transaction", description = "Эндпоинты для взаимодействия с данными пользователя")
@@ -38,8 +40,14 @@ public class UserController {
     @GetMapping("/v1/user/user-management/check-payment")
     @ApiOperation(value = "Проверить доступный способ оплаты для пользователя")
     public ResponseEntity<CheckPaymentResponse> checkPayment(@RequestParam int id) {
-        userService.listenPerformPayment();
-        return userService.checkPayment((long) id);
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(() -> userService.listenPerformPayment());
+
+        ResponseEntity<CheckPaymentResponse> response = userService.checkPayment((long) id);
+
+        executor.shutdown(); // Не забудьте остановить ExecutorService после использования
+
+        return response;
     }
 
     @GetMapping("/v1/user/user-management/check-phone")

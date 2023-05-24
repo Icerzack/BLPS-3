@@ -44,27 +44,27 @@ public class Consumer {
         consumer.subscribe(Arrays.asList(TOPIC_NAME));
     }
 
-    public static void startConsuming() {
+    public static PerformPaymentRequest startConsuming() {
         try {
             while (true) {
                 ConsumerRecords<String, PerformPaymentRequest> records = consumer.poll(Duration.ofMillis(100));
-
                 for (ConsumerRecord<String, PerformPaymentRequest> record : records) {
-                    processMessage(record);
+                    PerformPaymentRequest paymentRequest = processMessage(record);
 
                     commitOffset(record);
+                    return paymentRequest;
                 }
             }
         } catch (Exception e) {
             logger.error("Unexpected exception", e);
         }
+        return null;
     }
 
-    private static void processMessage(ConsumerRecord<String, PerformPaymentRequest> record) {
+    private static PerformPaymentRequest processMessage(ConsumerRecord<String, PerformPaymentRequest> record) {
         PerformPaymentRequest paymentRequest = record.value();
         logger.info("Received PerformPaymentRequest: " + paymentRequest);
-
-        // Process the message
+        return paymentRequest;
     }
 
     private static void commitOffset(ConsumerRecord<String, PerformPaymentRequest> record) {

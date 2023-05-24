@@ -1,11 +1,15 @@
 package com.example.demo.Service;
 
+import com.example.demo.Dao.Order.OrderEntity;
+import com.example.demo.Dao.Order.OrderRepository;
 import com.example.demo.Dao.Payment.PaymentsEntity;
 import com.example.demo.Dao.Payment.PaymentsRepository;
 import com.example.demo.Dao.User.UserEntity;
 import com.example.demo.Dao.User.UserRepository;
 import com.example.demo.Dao.UserPayments.UserPaymentEntity;
 import com.example.demo.Dao.UserPayments.UserPaymentRepository;
+import com.example.demo.Dto.PaymentType;
+import com.example.demo.Dto.Requests.PerformPaymentRequest;
 import com.example.demo.Dto.Responses.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.jta.JtaTransactionManager;
 
 import javax.transaction.*;
+import java.sql.Timestamp;
 import java.util.Optional;
 
 import static com.example.demo.kafka.consumer.Consumer.*;
@@ -25,6 +30,8 @@ public class UserService {
     private PaymentsRepository paymentRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private OrderRepository orderRepository;
 
     @Autowired
     private JtaTransactionManager transactionManager;
@@ -173,15 +180,36 @@ public class UserService {
         }
         return ResponseEntity.ok(deletePaymentResponse);
     }
-    public void listenPerformPayment() {
+    public boolean addOrder(PerformPaymentRequest performPaymentRequest) {
+        // Ваш код для добавления заказа
+        OrderEntity order = new OrderEntity();
+        Optional<UserEntity> userEntity = userRepository.findById(performPaymentRequest.getUserId());
+        if (userEntity.isPresent()) {
+            order.setUser(userEntity.get());
+        } else{
+            return false;
+        }
+        order.setOrderDate(new Timestamp(System.currentTimeMillis()));
+        order.setAddress(performPaymentRequest.getAddress());
+        Optional<PaymentsEntity> paymentsEntity = paymentRepository.findByCardNum(performPaymentRequest.getCardNum());
+        if (paymentsEntity.isPresent()){
+            order.setPaymentId(paymentsEntity.get().getId());
+            order.setPaymentType(PaymentType.CARD);
+        } else {
+            order.setPaymentId((long)-1);
+            order.setPaymentType(PaymentType.CASH);
+        }
+        order.setCost(performPaymentRequest.getCost());
+        orderRepository.save(order);
+        return true;
+    }
+    public boolean listenPerformPayment() {
         // kafka pull
         configureConsumer();
-
         subscribeToTopic();
-
-        startConsuming();
-
+        PerformPaymentRequest currentPerformPaymentRequest = startConsuming();
         closeConsumer();
         // add to db
+        return addOrder(currentPerformPaymentRequest);
     }
 }
