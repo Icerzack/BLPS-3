@@ -4,6 +4,7 @@ import com.example.demo.Dao.Payment.PaymentsEntity;
 import com.example.demo.Dao.Payment.PaymentsRepository;
 import com.example.demo.Dao.User.UserEntity;
 import com.example.demo.Dao.User.UserRepository;
+import com.example.demo.Dao.UserPayments.UserPaymentEntity;
 import com.example.demo.Dao.UserPayments.UserPaymentRepository;
 import com.example.demo.Dto.Responses.CheckPaymentResponse;
 import com.example.demo.Dto.Responses.PerformPaymentResponse;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -66,10 +68,10 @@ public class QuartzService {
                 String date = optionalPaymentEntity.get().getCardDate();
                 LocalDate currentDate = LocalDate.now();
 
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM");
-                LocalDate specifiedDate = LocalDate.parse(date, formatter);
+                YearMonth yearMonth = YearMonth.parse(date, DateTimeFormatter.ofPattern("MM/yy"));
+                LocalDate withDay = yearMonth.atDay(1);
 
-                if (specifiedDate.isBefore(currentDate)) {
+                if (withDay.isBefore(currentDate)) {
                     cardsToDelete.add(optionalPaymentEntity.get());
                 }
 

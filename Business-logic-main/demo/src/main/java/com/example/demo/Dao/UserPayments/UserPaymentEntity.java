@@ -15,11 +15,11 @@ public class UserPaymentEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private UserEntity user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "payment_id", referencedColumnName = "id", nullable = false)
     private PaymentsEntity payment;
 
