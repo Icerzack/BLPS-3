@@ -15,6 +15,8 @@ import org.springframework.transaction.jta.JtaTransactionManager;
 import javax.transaction.*;
 import java.util.Optional;
 
+import static com.example.demo.kafka.consumer.Consumer.*;
+
 @Service
 public class UserService {
     @Autowired
@@ -170,6 +172,16 @@ public class UserService {
             deletePaymentResponse.setResult(false);
         }
         return ResponseEntity.ok(deletePaymentResponse);
+    }
+    public void listenPerformPayment() {
+        // kafka pull
+        configureConsumer();
 
+        subscribeToTopic();
+
+        startConsuming();
+
+        closeConsumer();
+        // add to db
     }
 }

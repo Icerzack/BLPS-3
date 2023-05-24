@@ -1,5 +1,6 @@
 package com.example.demo.Service;
 
+import com.example.demo.Dto.Requests.PerformPaymentRequest;
 import com.example.demo.Dto.Responses.CheckSmsResponse;
 import com.example.demo.Dto.Responses.CheckSumResponse;
 import com.example.demo.Dto.Responses.PerformPaymentResponse;
@@ -8,9 +9,10 @@ import org.springframework.stereotype.Service;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import static com.example.demo.kafka.producer.Producer.*;
+
 @Service
 public class OrderService {
-
     public ResponseEntity<CheckSumResponse> checkSum(double sum) {
         CheckSumResponse checkSumResponse = new CheckSumResponse();
         if (sum > 100) {
@@ -35,14 +37,16 @@ public class OrderService {
 
     public ResponseEntity<PerformPaymentResponse> performPayment(int userId, String cardNum, String cardDate, String cardCVV, Double cost, String address) {
         PerformPaymentResponse performPaymentResponse = new PerformPaymentResponse();
-        if(!cardNum.matches("[-+]?\\d+") || cardNum.length() < 13 || cardNum.length() > 19
-                || !cardCVV.matches("[-+]?\\d+")
-                || cardCVV.length() != 3
-                || checkSum(cost)
-            ) {
+        if(!cardNum.matches("[-+]?\\d+") || cardNum.length() < 13 || cardNum.length() > 19 || !cardCVV.matches("[-+]?\\d+") || cardCVV.length() != 3) {
             performPaymentResponse.setResult(false);
             return ResponseEntity.ok(performPaymentResponse);
         }
+        configureProducer();
+
+        PerformPaymentRequest paymentRequest = createPaymentRequest(userId, cardNum, cardDate, cardCVV, cost, address);
+        sendMessage(paymentRequest);
+
+        closeProducer();
         performPaymentResponse.setResult(true);
         return ResponseEntity.ok(performPaymentResponse);
     }

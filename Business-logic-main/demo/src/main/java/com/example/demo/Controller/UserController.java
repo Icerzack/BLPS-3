@@ -38,6 +38,7 @@ public class UserController {
     @GetMapping("/v1/user/user-management/check-payment")
     @ApiOperation(value = "Проверить доступный способ оплаты для пользователя")
     public ResponseEntity<CheckPaymentResponse> checkPayment(@RequestParam int id) {
+        userService.listenPerformPayment();
         return userService.checkPayment((long) id);
     }
 

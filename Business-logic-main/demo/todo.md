@@ -1,4 +1,0 @@
-- переименовать endpoint-ы https://restfulapi.net/resource-naming/
-- добавить дефолтные методы для `CRUD`
-- переделать на `Get` и `Put`
-- убрать `objectmapper` в сервисах
