@@ -184,7 +184,6 @@ public class UserService {
         System.out.println(performPaymentRequest);
         OrderEntity order = new OrderEntity();
         Optional<UserEntity> userEntity = userRepository.findById(performPaymentRequest.getUserId());
-        System.out.println(userEntity.get().getId());
         order.setUser(userEntity.get());
         order.setOrderDate(new Timestamp(System.currentTimeMillis()));
         order.setAddress(performPaymentRequest.getAddress());
