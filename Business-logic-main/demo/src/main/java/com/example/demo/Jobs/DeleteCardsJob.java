@@ -18,8 +18,8 @@ public class DeleteCardsJob implements Job {
 
     @Override
     public void execute(JobExecutionContext context) {
-        System.out.println("Running cron task on deleting cards");
-        quartzService.deleteNonValidCards();
+//        System.out.println("Running cron task on deleting cards");
+//        quartzService.deleteNonValidCards();
     }
 
 }

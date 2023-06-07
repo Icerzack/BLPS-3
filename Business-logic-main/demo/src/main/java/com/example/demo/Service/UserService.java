@@ -1,11 +1,15 @@
 package com.example.demo.Service;
 
+import com.example.demo.Dao.Order.OrderEntity;
+import com.example.demo.Dao.Order.OrderRepository;
 import com.example.demo.Dao.Payment.PaymentsEntity;
 import com.example.demo.Dao.Payment.PaymentsRepository;
 import com.example.demo.Dao.User.UserEntity;
 import com.example.demo.Dao.User.UserRepository;
 import com.example.demo.Dao.UserPayments.UserPaymentEntity;
 import com.example.demo.Dao.UserPayments.UserPaymentRepository;
+import com.example.demo.Dto.PaymentType;
+import com.example.demo.Dto.Requests.PerformPaymentRequest;
 import com.example.demo.Dto.Responses.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.jta.JtaTransactionManager;
 
 import javax.transaction.*;
+import java.sql.Timestamp;
 import java.util.Optional;
 
 @Service
@@ -23,7 +28,8 @@ public class UserService {
     private PaymentsRepository paymentRepository;
     @Autowired
     private UserRepository userRepository;
-
+    @Autowired
+    private OrderRepository orderRepository;
     @Autowired
     private JtaTransactionManager transactionManager;
 
@@ -72,9 +78,9 @@ public class UserService {
         return ResponseEntity.ok(deletePhoneResponse);
     }
 
-    public ResponseEntity<AddPaymentResponse> addPayment(Long userId, String cardNum, String cardDate, String cardCvv) {
+    public ResponseEntity<AddPaymentResponse> addPayment(Long userId, String cardNum, String cardDate, String cardCVV) {
         AddPaymentResponse addPaymentResponse = new AddPaymentResponse();
-        if(!cardNum.matches("[-+]?\\d+") || cardNum.length() < 13 || cardNum.length() > 19 || !cardCvv.matches("[-+]?\\d+") || cardCvv.length() != 3){
+        if(!cardNum.matches("[-+]?\\d+") || cardNum.length() < 13 || cardNum.length() > 19 || !cardCVV.matches("[-+]?\\d+") || cardCVV.length() != 3){
             addPaymentResponse.setResult(false);
             return ResponseEntity.ok(addPaymentResponse);
         }
@@ -95,7 +101,7 @@ public class UserService {
             if(!paymentEntity.isPresent()){
                 newPaymentEntity.setCardNum(cardNum);
                 newPaymentEntity.setCardDate(cardDate);
-                newPaymentEntity.setCardCvv(cardCvv);
+                newPaymentEntity.setCardCVV(cardCVV);
                 paymentRepository.save(newPaymentEntity);
             } else {
                 newPaymentEntity = paymentEntity.get();
@@ -144,7 +150,7 @@ public class UserService {
             if(optionalPaymentEntity.isPresent()){
                 checkPaymentResponse.setCardNumber(optionalPaymentEntity.get().getCardNum());
                 checkPaymentResponse.setCardDate(optionalPaymentEntity.get().getCardDate());
-                checkPaymentResponse.setCardCvv(optionalPaymentEntity.get().getCardCvv());
+                checkPaymentResponse.setCardCVV(optionalPaymentEntity.get().getCardCVV());
                 checkPaymentResponse.setResult(true);
 
                 return ResponseEntity.ok(checkPaymentResponse);
@@ -152,7 +158,7 @@ public class UserService {
         }
         checkPaymentResponse.setCardNumber("");
         checkPaymentResponse.setCardDate("");
-        checkPaymentResponse.setCardCvv("");
+        checkPaymentResponse.setCardCVV("");
         checkPaymentResponse.setResult(false);
 
         return ResponseEntity.ok(checkPaymentResponse);
@@ -171,5 +177,23 @@ public class UserService {
         }
         return ResponseEntity.ok(deletePaymentResponse);
 
+    }
+
+    public boolean addOrder(PerformPaymentRequest performPaymentRequest) {
+        OrderEntity order = new OrderEntity();
+        Optional<UserEntity> userEntity = userRepository.findById(performPaymentRequest.getUserId());
+        order.setUser(userEntity.get());
+        order.setOrderDate(new Timestamp(System.currentTimeMillis()));
+        order.setAddress(performPaymentRequest.getAddress());
+        Optional<PaymentsEntity> paymentsEntity = paymentRepository.findByCardNum(performPaymentRequest.getCardNum());
+        if (paymentsEntity.isPresent()){
+            order.setPaymentId(paymentsEntity.get().getId());
+            order.setPaymentType(PaymentType.CARD);
+        } else {
+            order.setPaymentType(PaymentType.CASH);
+        }
+        order.setCost(performPaymentRequest.getCost());
+        orderRepository.save(order);
+        return true;
     }
 }

@@ -32,10 +32,13 @@ public class OrderController {
     @PostMapping("/v1/order-management/perform-payment")
     @ApiOperation(value = "Осуществляет покупку с указанными данными карты")
     public ResponseEntity<PerformPaymentResponse> performPayment(@RequestBody PerformPaymentRequest request) {
+        long userId = request.getUserId();
         String cardNum = request.getCardNum();
         String cardDate = request.getCardDate();
-        String cardCvv = request.getCardCvv();
-        return orderService.performPayment(cardNum, cardDate, cardCvv);
+        String cardCVV = request.getCardCVV();
+        Double cost = request.getCost();
+        String address = request.getAddress();
+        return orderService.performPayment(userId, cardNum, cardDate, cardCVV, cost, address);
     }
 
 }

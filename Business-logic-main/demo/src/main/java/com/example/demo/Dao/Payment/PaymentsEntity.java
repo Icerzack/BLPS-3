@@ -16,6 +16,6 @@ public class PaymentsEntity {
     @Column(nullable = false, name = "card_date")
     private String cardDate;
     @Column(nullable = false, name = "card_cvv")
-    private String cardCvv;
+    private String cardCVV;
 
 }

@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class AddPhoneRequest {
-    private int userId;
+    private long userId;
     private String phoneNumber;
 }
