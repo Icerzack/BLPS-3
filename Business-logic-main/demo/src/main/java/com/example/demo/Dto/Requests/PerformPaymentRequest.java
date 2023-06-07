@@ -11,6 +11,9 @@ public class PerformPaymentRequest {
     private Double cost;
     private String address;
 
+    public PerformPaymentRequest(){
+
+    }
     public PerformPaymentRequest(long userId, String cardNum, String cardDate, String cardCVV, Double cost, String address){
         this.userId = userId;
         this.cardNum = cardNum;

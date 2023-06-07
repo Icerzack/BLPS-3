@@ -13,6 +13,8 @@ import com.example.demo.Dto.Requests.PerformPaymentRequest;
 import com.example.demo.Dto.Responses.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.jta.JtaTransactionManager;
 
@@ -179,21 +181,85 @@ public class UserService {
 
     }
 
-    public boolean addOrder(PerformPaymentRequest performPaymentRequest) {
-        OrderEntity order = new OrderEntity();
-        Optional<UserEntity> userEntity = userRepository.findById(performPaymentRequest.getUserId());
-        order.setUser(userEntity.get());
-        order.setOrderDate(new Timestamp(System.currentTimeMillis()));
-        order.setAddress(performPaymentRequest.getAddress());
-        Optional<PaymentsEntity> paymentsEntity = paymentRepository.findByCardNum(performPaymentRequest.getCardNum());
-        if (paymentsEntity.isPresent()){
-            order.setPaymentId(paymentsEntity.get().getId());
-            order.setPaymentType(PaymentType.CARD);
-        } else {
-            order.setPaymentType(PaymentType.CASH);
+//    public boolean addOrder(PerformPaymentRequest performPaymentRequest) {
+//        OrderEntity order = new OrderEntity();
+//        Optional<UserEntity> userEntity = userRepository.findById(performPaymentRequest.getUserId());
+//        order.setUser(userEntity.get());
+//        order.setOrderDate(new Timestamp(System.currentTimeMillis()));
+//        order.setAddress(performPaymentRequest.getAddress());
+//        Optional<PaymentsEntity> paymentsEntity = paymentRepository.findByCardNum(performPaymentRequest.getCardNum());
+//        if (paymentsEntity.isPresent()){
+//            order.setPaymentId(paymentsEntity.get().getId());
+//            order.setPaymentType(PaymentType.card);
+//        } else {
+//            order.setPaymentType(PaymentType.cash);
+//        }
+//        order.setCost(performPaymentRequest.getCost());
+//        orderRepository.save(order);
+//        return true;
+//    }
+
+    @Component
+    public class KafkaListeners {
+
+        @KafkaListener(
+                topics = "perform-test3",
+                groupId = "consumer-perform-test3"
+        )
+        public boolean listenerOrders1(String data) {
+            PerformPaymentRequest performPaymentRequest = new PerformPaymentRequest();
+            try {
+                performPaymentRequest = deserializeData(data);
+                System.out.println("Listener1 received: " + performPaymentRequest + "!!!");
+            } catch (Exception e) {
+                System.out.println("Error deserializing PerformPaymentRequest: " + e.getMessage());
+            }
+            return addOrderToDB(performPaymentRequest);
         }
-        order.setCost(performPaymentRequest.getCost());
-        orderRepository.save(order);
-        return true;
+
+        @KafkaListener(
+                topics = "perform-test3",
+                groupId = "consumer-perform-test3"
+        )
+        public boolean listenerOrders2(String data) {
+            PerformPaymentRequest performPaymentRequest = new PerformPaymentRequest();
+            try {
+                performPaymentRequest = deserializeData(data);
+                System.out.println("Listener2 received: " + performPaymentRequest + "!!!");
+            } catch (Exception e) {
+                System.out.println("Error deserializing PerformPaymentRequest: " + e.getMessage());
+            }
+            return addOrderToDB(performPaymentRequest);
+        }
+
+        private boolean addOrderToDB(PerformPaymentRequest performPaymentRequest) {
+            OrderEntity order = new OrderEntity();
+            Optional<UserEntity> userEntity = userRepository.findById(performPaymentRequest.getUserId());
+            order.setUser(userEntity.get());
+            order.setOrderDate(new Timestamp(System.currentTimeMillis()));
+            order.setAddress(performPaymentRequest.getAddress());
+            Optional<PaymentsEntity> paymentsEntity = paymentRepository.findByCardNum(performPaymentRequest.getCardNum());
+            if (paymentsEntity.isPresent()) {
+                order.setPaymentId(paymentsEntity.get().getId());
+                order.setPaymentType(PaymentType.card);
+            } else {
+                order.setPaymentType(PaymentType.cash);
+            }
+            order.setCost(performPaymentRequest.getCost());
+            orderRepository.save(order);
+            return true;
+        }
+
+        private PerformPaymentRequest deserializeData(String data) {
+            String[] parts = data.split(",");
+            long userId = Long.parseLong(parts[0].split(":")[1].trim());
+            String cardNum = parts[1].split(":")[1].trim().replaceAll("\"", "");
+            String cardDate = parts[2].split(":")[1].trim().replaceAll("\"", "");
+            String cardCVV = parts[3].split(":")[1].trim().replaceAll("\"", "");
+            double cost = Double.parseDouble(parts[4].split(":")[1].trim());
+            String address = parts[5].substring(parts[5].indexOf(":") + 1).trim().replaceAll("\"", "").replaceAll("}", "");
+
+            return new PerformPaymentRequest(userId, cardNum, cardDate, cardCVV, cost, address);
+        }
     }
 }
