@@ -27,7 +27,7 @@ public class OrderEntity {
     private String address;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "payment_type", nullable = false)
+    @Column(name = "payment_type", columnDefinition = "paymentType", nullable = false)
     private PaymentType paymentType;
 
     @Column(name = "payment_id")

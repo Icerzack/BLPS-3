@@ -7,5 +7,5 @@ public class CheckPaymentResponse {
     private boolean result;
     private String cardNumber;
     private String cardDate;
-    private String cardCvv;
+    private String cardCVV;
 }

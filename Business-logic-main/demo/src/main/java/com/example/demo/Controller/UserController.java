@@ -9,8 +9,6 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @RestController
 @Api(tags = "Transaction", description = "Эндпоинты для взаимодействия с данными пользователя")
@@ -22,32 +20,25 @@ public class UserController {
     @PutMapping("/v1/user-management/add-phone")
     @ApiOperation(value = "Добавить номер телефона для пользователя")
     public ResponseEntity<AddPhoneResponse> addPhone(@RequestBody AddPhoneRequest request) {
-        int id = request.getUserId();
+        long id = request.getUserId();
         String phone = request.getPhoneNumber();
-        return userService.addPhone((long) id, phone);
+        return userService.addPhone(id, phone);
     }
 
     @PutMapping("/v1/user/user-management/add-payment")
     @ApiOperation(value = "Добавить карту для пользователя")
     public ResponseEntity<AddPaymentResponse> addPayment(@RequestBody AddPaymentRequest request) {
-        int userId = request.getUserId();
+        long userId = request.getUserId();
         String cardNum = request.getCardNum();
         String cardDate = request.getCardDate();
-        String cardCvv =  request.getCardCvv();
-        return userService.addPayment((long) userId, cardNum, cardDate, cardCvv);
+        String cardCVV =  request.getCardCVV();
+        return userService.addPayment((long) userId, cardNum, cardDate, cardCVV);
     }
 
     @GetMapping("/v1/user/user-management/check-payment")
     @ApiOperation(value = "Проверить доступный способ оплаты для пользователя")
     public ResponseEntity<CheckPaymentResponse> checkPayment(@RequestParam int id) {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.submit(() -> userService.listenPerformPayment());
-
-        ResponseEntity<CheckPaymentResponse> response = userService.checkPayment((long) id);
-
-        executor.shutdown(); // Не забудьте остановить ExecutorService после использования
-
-        return response;
+        return userService.checkPayment((long) id);
     }
 
     @GetMapping("/v1/user/user-management/check-phone")

@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS users, payments, orders, user_payments;
 DROP TYPE IF EXISTS paymentTypes;
 
-CREATE TYPE paymentTypes AS ENUM ('cash', 'card');
+-- CREATE TYPE paymentType AS ENUM ('cash', 'card');
 
 CREATE TABLE users (
   id bigserial PRIMARY KEY,
@@ -21,13 +21,13 @@ CREATE TABLE payments (
 );
 
 CREATE TABLE orders (
-  id bigserial PRIMARY KEY,
-  user_id bigint REFERENCES users(id) ON DELETE CASCADE,
-  payment_id bigint REFERENCES payments(id) ON DELETE CASCADE,
-  cost double precision NOT NULL,
-  order_date timestamp NOT NULL,
-  address VARCHAR(100) NOT NULL,
-  payment_type paymentTypes NOT NULL
+                        id bigserial PRIMARY KEY,
+                        user_id bigint REFERENCES users(id) ON DELETE CASCADE,
+                        payment_id bigint REFERENCES payments(id) ON DELETE CASCADE,
+                        cost double precision NOT NULL,
+                        order_date timestamp NOT NULL,
+                        address VARCHAR(100) NOT NULL,
+                        payment_type varchar(10) NOT NULL
 );
 
 CREATE TABLE user_payments (

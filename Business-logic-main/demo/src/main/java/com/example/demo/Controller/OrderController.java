@@ -19,26 +19,26 @@ public class OrderController {
 
     @GetMapping("/v1/order-management/check-sum")
     @ApiOperation(value = "Проверяет, что сумма больше 100")
-    public ResponseEntity<CheckSumResponse> checkSum(@RequestParam int sum) {
-        return orderService.checkSum(sum);
+    public ResponseEntity<CheckSumResponse> checkSum(@RequestParam int id, @RequestParam int sum) {
+        return orderService.checkSum((long) id, sum);
     }
 
     @GetMapping("/v1/order-management/check-sms")
     @ApiOperation(value = "Проверяет, что введенный код смс верен для данного номера")
-    public ResponseEntity<CheckSmsResponse> checkSms(@RequestParam String phone, @RequestParam String sms) {
-        return orderService.checkSms(phone, sms);
+    public ResponseEntity<CheckSmsResponse> checkSms(@RequestParam int id, @RequestParam String phone, @RequestParam String sms) {
+        return orderService.checkSms(id, phone, sms);
     }
 
     @PostMapping("/v1/order-management/perform-payment")
     @ApiOperation(value = "Осуществляет покупку с указанными данными карты")
     public ResponseEntity<PerformPaymentResponse> performPayment(@RequestBody PerformPaymentRequest request) {
-        int userId = request.getUserId();
+        long userId = request.getUserId();
         String cardNum = request.getCardNum();
         String cardDate = request.getCardDate();
-        String cardCvv = request.getCardCvv();
+        String cardCVV = request.getCardCVV();
         Double cost = request.getCost();
         String address = request.getAddress();
-        return orderService.performPayment(userId, cardNum, cardDate, cardCvv, cost, address);
+        return orderService.performPayment(userId, cardNum, cardDate, cardCVV, cost, address);
     }
 
 }
