@@ -4,8 +4,6 @@ import com.example.demo.Dto.Requests.PerformPaymentRequest;
 import com.example.demo.Dto.Responses.CheckSmsResponse;
 import com.example.demo.Dto.Responses.CheckSumResponse;
 import com.example.demo.Dto.Responses.PerformPaymentResponse;
-import com.example.demo.Service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -14,8 +12,6 @@ import org.apache.commons.lang3.StringUtils;
 
 @Service
 public class OrderService {
-    @Autowired
-    private UserService userService;
     private KafkaTemplate<String, PerformPaymentRequest> kafkaTemplate;
     public OrderService(KafkaTemplate<String, PerformPaymentRequest> kafkaTemplate){
         this.kafkaTemplate = kafkaTemplate;
